@@ -1,1 +1,4 @@
 **/__pycache__
+
+# dont commit local database, using data fixture. see README.md
+db.sqlite3
