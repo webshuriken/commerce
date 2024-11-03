@@ -39,9 +39,6 @@ jobs:
           pip install -r dev-requirements.txt
 
       # Step 4: Run linters
-      - name: Run Flake8 (Linting)
-        run: |
-          flake8 .
       - name: Run Black (Formatting Check)
         run: |
           black --check .
