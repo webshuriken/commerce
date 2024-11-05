@@ -13,12 +13,6 @@ jobs:
     - name: Check if the push is from a PR
       run: |
         if [ "${{ github.event_name }}" != "pull_request" ]; then
-          echo "Pushes to main branch are only allowed through a pull request from the dev branch."
+          echo "Pushes to main branch are only allowed through a pull request."
           exit 1
         fi
-
-    - name: Check if the PR is from dev branch
-      if: ${{ github.event.pull_request.head.ref != 'dev' }}
-      run: |
-        echo "The pull request must come from the dev branch."
-        exit 1
