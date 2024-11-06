@@ -28,3 +28,11 @@ class Listing(models.Model):
     # custom string representation
     def __str__(self):
         return f"ID: {self.id}: {self.title}\nDescription: {self.description}\nValue: {self.value}\nCreated by: {self.user}\n"
+
+class Comment(models.Model):
+    comment = models.CharField()
+    user = models.ForeignKey()
+    listing = models.ForeignKey()
+
+    def __str__(self):
+        return f"ID: {self.id}: {self.comment} by user {self.user}\nFor listing: {self.listing}\n"
