@@ -30,9 +30,9 @@ class Listing(models.Model):
         return f"ID: {self.id}: {self.title}\nDescription: {self.description}\nValue: {self.value}\nCreated by: {self.user}\n"
 
 class Comment(models.Model):
-    comment = models.CharField()
-    user = models.ForeignKey()
-    listing = models.ForeignKey()
+    comment = models.CharField(max_length=512, validators=[validate_profanity])
+    user = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name="comments")
+    listing = models.ForeignKey(Listing, default=None, on_delete=models.CASCADE, related_name="listing_comments")
 
     def __str__(self):
         return f"ID: {self.id}: {self.comment} by user {self.user}\nFor listing: {self.listing}\n"
