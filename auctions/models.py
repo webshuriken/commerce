@@ -18,13 +18,20 @@ def validate_profanity(text):
 class User(AbstractUser):
     pass
 
+# It is not populated by the app user, but by the developer
+class Category(models.Model):
+    name = models.CharField(max_length=150, unique=True)
+
+    def __str__(self):
+        return f"ID: {self.id}: {self.name}\n"
+
 class Listing(models.Model):
     title = models.CharField(max_length=100, validators=[validate_profanity])
     description = models.CharField(max_length=1000, validators=[validate_profanity])
     value = models.DecimalField(max_digits=12, decimal_places=2, validators=[validate_price])
     image = models.URLField(blank=True, null=True)
     user = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name="creator")
-    # category = models.ForeignKey(default=None, on_delete=models.CASCADE, related_name="category")
+    category = models.ForeignKey(Category, default=None, on_delete=models.CASCADE, related_name="category")
 
     # custom string representation
     def __str__(self):
