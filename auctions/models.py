@@ -45,3 +45,10 @@ class Bid(models.Model):
 
     def __str__(self):
         return f"ID:{self.id}: {self.value} bid by {self.user}\n"
+
+# It is not populated by the app user, but by the developer
+class Category(models.Model):
+    name = models.CharField()
+
+    def __str__(self):
+        return f"ID: {self.id}: {self.name}\n"
