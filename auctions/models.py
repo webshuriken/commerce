@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.exceptions import ValidationError
 from better_profanity import profanity
+from decimal import Decimal
 
 
 # custom validator used by Listing model
@@ -36,3 +37,11 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"ID: {self.id}: {self.comment} by user {self.user}\nFor listing: {self.listing}\n"
+
+class Bid(models.Model):
+    value = models.DecimalField()
+    user = models.ForeignKey(User)
+    listing = models.ForeignKey(Listing)
+
+    def __str__(self):
+        return f"ID:{self.id}: {self.value} bid by {self.user}\n"
