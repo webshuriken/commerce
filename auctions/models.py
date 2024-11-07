@@ -39,9 +39,9 @@ class Comment(models.Model):
         return f"ID: {self.id}: {self.comment} by user {self.user}\nFor listing: {self.listing}\n"
 
 class Bid(models.Model):
-    value = models.DecimalField()
-    user = models.ForeignKey(User)
-    listing = models.ForeignKey(Listing)
+    value = models.DecimalField(max_digits=7, decimal_places=2, validators=[validate_price])
+    user = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name="bids")
+    listing = models.ForeignKey(Listing, default=None, on_delete=models.PROTECT, related_name="listing_bids")
 
     def __str__(self):
         return f"ID:{self.id}: {self.value} bid by {self.user}\n"
