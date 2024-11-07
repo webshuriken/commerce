@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from .models import Listing, User, Comment, Bid
+from .models import Listing, User, Comment, Bid, Category
 # Decimal is used to represent the value of a bid
 from decimal import Decimal
 
@@ -10,18 +10,21 @@ class ListingModelTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='12345')
+        self.category = Category.objects.create(name="Test Category")
 
     def test_create_valid_listing(self):
         listing = Listing.objects.create(
             title="Valid Title",
             description="Valid Description",
             value=100.00,
-            user=self.user
+            user=self.user,
+            category=self.category
         )
         self.assertEqual(listing.title, "Valid Title")
         self.assertEqual(listing.description, "Valid Description")
         self.assertEqual(listing.value, 100.00)
         self.assertEqual(listing.user, self.user)
+        self.assertEqual(listing.category, self.category)
 
     def test_validate_price(self):
         with self.assertRaises(ValidationError):
@@ -29,7 +32,8 @@ class ListingModelTest(TestCase):
                 title="Valid Title",
                 description="Valid Description",
                 value=-10.00,
-                user=self.user
+                user=self.user,
+                category=self.category
             ).full_clean()
 
     def test_validate_title_profanity(self):
@@ -38,7 +42,8 @@ class ListingModelTest(TestCase):
                 title="Fuck the pain away",
                 description="Valid Description",
                 value=100.00,
-                user=self.user
+                user=self.user,
+                category=self.category
             ).full_clean()
     
     def test_validate_description_profanity(self):
@@ -47,7 +52,8 @@ class ListingModelTest(TestCase):
                 title="Valid title",
                 description="sucking on my titis like you wanted me to",
                 value=100.00,
-                user=self.user
+                user=self.user,
+                category=self.category
             ).full_clean()
       
     def test_validate_profanity_edge1(self):
@@ -57,7 +63,8 @@ class ListingModelTest(TestCase):
               title="Valid title",
               description="You can not sneak 5h1t is this text",
               value=100.00,
-              user=self.user
+              user=self.user,
+              category=self.category
           ).full_clean()
 
     def test_listing_str(self):
@@ -65,7 +72,8 @@ class ListingModelTest(TestCase):
             title="Valid Title",
             description="Valid Description",
             value=100.00,
-            user=self.user
+            user=self.user,
+            category=self.category
         )
         expected_str = f"ID: {listing.id}: {listing.title}\nDescription: {listing.description}\nValue: {listing.value}\nCreated by: {listing.user}\n"
         self.assertEqual(str(listing), expected_str)
@@ -75,11 +83,13 @@ class CommentModelTest(TestCase):
     def setUp(self):
         # Comment model requires a listing and a user
         self.user = User.objects.create_user(username='testuser', password='12345')
+        self.category = Category.objects.create(name="Test Category")
         self.listing = Listing.objects.create(
             title="Valid Title",
             description="Valid Description",
             value=100.00,
-            user=self.user
+            user=self.user,
+            category=self.category
         )
 
     def test_create_valid_comment(self):
@@ -121,11 +131,13 @@ class BidModelTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='12345')
+        self.category = Category.objects.create(name="Test Category")
         self.listing = Listing.objects.create(
             title='Test Listing',
             description='Test Description',
             value=100.00,
-            user=self.user
+            user=self.user,
+            category=self.category
         )
         self.bid = Bid.objects.create(
             value=50.00,
@@ -157,3 +169,40 @@ class BidModelTest(TestCase):
             listing=self.listing
         )
         self.assertEqual(max_value_bid.value, Decimal('99999.99'))
+
+class CategoryModelTest(TestCase):
+
+    def setUp(self):
+        self.electronics_category = Category.objects.create(name="Electronics")
+        self.garden_category = Category.objects.create(name="Garden")
+        self.user = User.objects.create(username="testuser", password="password")
+
+    def test_category_creation(self):
+        self.assertEqual(self.electronics_category.name, "Electronics")
+        self.assertEqual(self.garden_category.name, "Garden")
+        self.assertEqual(str(self.electronics_category), f"ID: {self.electronics_category.id}: Electronics\n")
+        self.assertEqual(str(self.garden_category), f"ID: {self.garden_category.id}: Garden\n")
+
+    def test_listing_with_electronics_category(self):
+        listing = Listing.objects.create(
+            title="Smartphone",
+            description="A brand new smartphone",
+            value=Decimal("299.99"),
+            user=self.user,
+            category=self.electronics_category
+        )
+        self.assertEqual(listing.title, "Smartphone")
+        self.assertEqual(listing.category, self.electronics_category)
+        self.assertEqual(str(listing.category), f"ID: {self.electronics_category.id}: Electronics\n")
+
+    def test_listing_with_garden_category(self):
+        listing = Listing.objects.create(
+            title="Garden Tools",
+            description="A set of garden tools",
+            value=Decimal("49.99"),
+            user=self.user,
+            category=self.garden_category
+        )
+        self.assertEqual(listing.title, "Garden Tools")
+        self.assertEqual(listing.category, self.garden_category)
+        self.assertEqual(str(listing.category), f"ID: {self.garden_category.id}: Garden\n")
