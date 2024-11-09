@@ -10,7 +10,9 @@ from .models import User, Listing
 def index(request):
     # load all active listings (default view)
     listings = Listing.objects.filter(active=True)
+    category = 'All'
     return render(request, "auctions/index.html", {
+        "category": category,
         "listings": listings
     })
 
