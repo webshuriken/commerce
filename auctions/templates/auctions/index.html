@@ -16,7 +16,7 @@
                     </figure>
                     <h3>{{ listing.title }}</h3>
                     <p>{{ listing.value }}</p>
-                    <p>{{ listing.description }}</p>
+                    <p>{{ listing.description|slice:":128" }} ...</p>
                 </div>
             </li>
         {% endfor %}
