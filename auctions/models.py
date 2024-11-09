@@ -26,6 +26,7 @@ class Category(models.Model):
         return f"ID: {self.id}: {self.name}\n"
 
 class Listing(models.Model):
+    active = models.BooleanField(default=True)
     title = models.CharField(max_length=100, validators=[validate_profanity])
     description = models.CharField(max_length=1000, validators=[validate_profanity])
     value = models.DecimalField(max_digits=12, decimal_places=2, validators=[validate_price])

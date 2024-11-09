@@ -1,7 +1,25 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+<section>
+    <header>
+        <h2>Category: {{ category }}</h2>
+        <span>{{ listings|length }} items</span>
+    </header>
 
-    TODO
+    <ul>
+        {% for listing in listings %}
+            <li>
+                <div>
+                    <figure>
+                        <img src="{{ listing.image }}" alt="Image of {{ listing.title }}">
+                    </figure>
+                    <h3>{{ listing.title }}</h3>
+                    <p>{{ listing.value }}</p>
+                    <p>{{ listing.description|slice:":128" }} ...</p>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</section>
 {% endblock %}
