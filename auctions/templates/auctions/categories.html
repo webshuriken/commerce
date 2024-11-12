@@ -9,7 +9,7 @@
   <ul>
     {% for category in categories %}
       <li>
-        <a href="{% url 'auctions:index' category.id %}">
+        <a href="{% url 'auctions:index_with_category' category.id %}">
           <figure>
             <img src="{{ category.image }}" alt="{{ category.name }}">
             <figcaption>{{ category.name }}</figcaption>
