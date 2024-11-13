@@ -7,14 +7,23 @@ from django.urls import reverse
 from .models import User, Listing, Category
 
 
-def index(request):
-    # load all active listings (default view)
-    listings = Listing.objects.filter(active=True)
-    category = 'All'
-    return render(request, "auctions/index.html", {
-        "category": category,
-        "listings": listings
-    })
+def index(request, category_id=None):
+    if category_id:
+        # load listings by category
+        listings = Listing.objects.filter(category_id=category_id, active=True)
+        category = Category.objects.get(id=category_id).name
+        return render(request, "auctions/index.html", {
+            "category": category,
+            "listings": listings
+        })
+    else:
+        # load all active listings (default view)
+        listings = Listing.objects.filter(active=True)
+        category = 'All'
+        return render(request, "auctions/index.html", {
+            "category": category,
+            "listings": listings
+        })
 
 
 def categories(request):
