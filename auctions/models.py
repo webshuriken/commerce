@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.exceptions import ValidationError
 from better_profanity import profanity
-from decimal import Decimal
 
 
 # custom validator used by Listing model
@@ -21,6 +20,7 @@ class User(AbstractUser):
 # It is not populated by the app user, but by the developer
 class Category(models.Model):
     name = models.CharField(max_length=150, unique=True)
+    image = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return f"ID: {self.id}: {self.name}\n"
