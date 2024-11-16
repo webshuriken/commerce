@@ -24,9 +24,6 @@
         <h3>Description:</h3>
         <p>{{ listing.description }}</p>
       </div>
-      <div>
-        <h3>Comments:</h3>
-        <p>TODO</p>
-      </div>
+      {% include 'auctions/comments.html' %}
     </section>
 {% endblock %}
