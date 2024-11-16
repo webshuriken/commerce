@@ -9,7 +9,11 @@
       <li>
         <div>
           <img src="{% static 'auctions/images/avatar_placeholder.svg' %}" width="100" height="100" alt="Avatar of {{ comment.user }}">
-          <h3>{{ comment.user }}</h3>
+          {% if comment.user == listing.user %}
+            <p>{{ comment.user }} (Author)</p>
+          {% else %}
+            <p>{{ comment.user }}</p>
+          {% endif %}
           <p>{{ comment.comment }}</p>
         </div>
       </li>
