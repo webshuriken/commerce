@@ -1,0 +1,29 @@
+{% extends 'auctions/layout.html' %}
+
+{% block title %}
+    {{ listing.title }}
+{% endblock %}
+
+{% block body %}
+    <section>
+      <header>
+        <h2>{{ listing.title }}</h2>
+        <img src="{{ listing.image }}" alt="Image of {{ listing.title }}">
+      </header>
+      <div>
+        <p>${{ listing.value }}</p>
+      </div>
+      <div>
+        <h3>Details:</h3>
+        <ul>
+          <li>Listed by: {{ listing.user }}</li>
+          <li>Category: {{ listing.category }}</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Description:</h3>
+        <p>{{ listing.description }}</p>
+      </div>
+      {% include 'auctions/comments.html' %}
+    </section>
+{% endblock %}

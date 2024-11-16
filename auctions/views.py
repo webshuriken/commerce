@@ -34,6 +34,16 @@ def categories(request):
     })
 
 
+def listing(request, listing_id):
+    # load listing by id and all comments
+    listing = Listing.objects.get(pk=listing_id)
+    comments = listing.listing_comments.all()
+    return render(request, "auctions/listing.html", {
+        "listing": listing,
+        "comments": comments
+    })
+
+
 def login_view(request):
     if request.method == "POST":
 
