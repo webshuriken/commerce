@@ -4,6 +4,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from .forms import NewListingForm
 
 from .models import User, Listing, Category
 
@@ -53,6 +54,11 @@ def watchlist(request):
     return render(request, "auctions/watchlist.html", {
         "watchlist": watchlist
     })
+
+
+@login_required(login_url='/login')
+def add_listing(request):
+    pass
 
 
 def login_view(request):
