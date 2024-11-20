@@ -44,6 +44,15 @@ def listing(request, listing_id):
     })
 
 
+def watchlist(request, user_id):
+    # load watchlist items by user id
+    user = User.objects.get(pk=user_id)
+    watchlist = user.watchlist.all()
+    return render(request, "auctions/watchlist.html", {
+        "watchlist": watchlist
+    })
+
+
 def login_view(request):
     if request.method == "POST":
 
