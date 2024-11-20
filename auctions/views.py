@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -44,6 +45,7 @@ def listing(request, listing_id):
     })
 
 
+@login_required(login_url='/login')
 def watchlist(request, user_id):
     # load watchlist items by user id
     user = User.objects.get(pk=user_id)
