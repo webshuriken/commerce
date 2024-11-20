@@ -58,7 +58,10 @@ def watchlist(request):
 
 @login_required(login_url='/login')
 def add_listing(request):
-    pass
+    form = NewListingForm()
+    return render(request, "auctions/add_listing.html", {
+        "form": form
+    })
 
 
 def login_view(request):
