@@ -2,9 +2,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse
-
+from django.core.exceptions import ValidationError
+from .forms import NewListingForm
 from .models import User, Listing, Category
 
 
@@ -53,6 +54,44 @@ def watchlist(request):
     return render(request, "auctions/watchlist.html", {
         "watchlist": watchlist
     })
+
+
+@login_required(login_url='/login')
+def add_listing(request):
+    # POST request
+    if request.method == "POST":
+        # bound form with posted form data
+        form = NewListingForm(request.POST)
+        if form.is_valid():
+            # get form data
+            title = form.cleaned_data["title"]
+            description = form.cleaned_data["description"]
+            starting_bid = form.cleaned_data["starting_bid"]
+            image_url = form.cleaned_data["image_url"]
+            category = form.cleaned_data["category"]
+
+            # create new listing
+            listing = Listing(title=title, description=description, value=starting_bid, image=image_url, category=category, user=request.user)
+            
+            try:
+                # apply model validation
+                listing.full_clean()
+                listing.save()
+                return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
+            except ValidationError as e:
+                # return form to user with errors
+                for field, errors in e.message_dict.items():
+                    for error in errors:
+                        form.add_error(field, error)
+                return render(request, "auctions/add_listing.html", {
+                    "form": form
+                })
+    else:
+        # GET request
+        form = NewListingForm()
+        return render(request, "auctions/add_listing.html", {
+            "form": form
+        })
 
 
 def login_view(request):
