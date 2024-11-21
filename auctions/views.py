@@ -70,7 +70,7 @@ def add_listing(request):
             category = form.cleaned_data["category"]
 
             # create new listing
-            listing = Listing(title=title, description=description, starting_bid=starting_bid, image_url=image_url, category=category, user=request.user)
+            listing = Listing(title=title, description=description, value=starting_bid, image=image_url, category=category, user=request.user)
             listing.save()
 
             return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
