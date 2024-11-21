@@ -4,6 +4,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.core.exceptions import ValidationError
 from .forms import NewListingForm
 from .models import User, Listing, Category
 
@@ -71,20 +72,26 @@ def add_listing(request):
 
             # create new listing
             listing = Listing(title=title, description=description, value=starting_bid, image=image_url, category=category, user=request.user)
-            listing.save()
-
-            return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
-        else:
-            # return form to user with errors
-            return render(request, "auctions/add_listing.html", {
-                "form": form
-            })
-
-    # GET request
-    form = NewListingForm()
-    return render(request, "auctions/add_listing.html", {
-        "form": form
-    })
+            
+            try:
+                # apply model validation
+                listing.full_clean()
+                listing.save()
+                return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
+            except ValidationError as e:
+                # return form to user with errors
+                for field, errors in e.message_dict.items():
+                    for error in errors:
+                        form.add_error(field, error)
+                return render(request, "auctions/add_listing.html", {
+                    "form": form
+                })
+    else:
+        # GET request
+        form = NewListingForm()
+        return render(request, "auctions/add_listing.html", {
+            "form": form
+        })
 
 
 def login_view(request):
