@@ -2,10 +2,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse
 from .forms import NewListingForm
-
 from .models import User, Listing, Category
 
 
@@ -58,6 +57,30 @@ def watchlist(request):
 
 @login_required(login_url='/login')
 def add_listing(request):
+    # POST request
+    if request.method == "POST":
+        # bound form with posted form data
+        form = NewListingForm(request.POST)
+        if form.is_valid():
+            # get form data
+            title = form.cleaned_data["title"]
+            description = form.cleaned_data["description"]
+            starting_bid = form.cleaned_data["starting_bid"]
+            image_url = form.cleaned_data["image_url"]
+            category = form.cleaned_data["category"]
+
+            # create new listing
+            listing = Listing(title=title, description=description, starting_bid=starting_bid, image_url=image_url, category=category, user=request.user)
+            listing.save()
+
+            return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
+        else:
+            # return form to user with errors
+            return render(request, "auctions/add_listing.html", {
+                "form": form
+            })
+
+    # GET request
     form = NewListingForm()
     return render(request, "auctions/add_listing.html", {
         "form": form
