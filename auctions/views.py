@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from .forms import NewListingForm
-from .models import User, Listing, Category
+from .models import User, Listing, Category, Watchlist
 
 
 def index(request, category_id=None):
@@ -92,6 +92,12 @@ def add_listing(request):
         return render(request, "auctions/add_listing.html", {
             "form": form
         })
+
+
+# post required to aceess this view
+# @require_POST()
+def watch_listing(request, listing_id):
+    return HttpResponse("Hello, developer. This is a placeholder response 'for watch_list' view.")
 
 
 def login_view(request):
