@@ -106,11 +106,13 @@ def watch_listing(request, listing_id):
     if user_watching:
         user_watching.delete()
         response['success'] = True
+        response['type'] = 'REMOVE'
         response['message'] = 'Listing removed from watchlist'
     else:
         watching = Watchlist(user=User.objects.get(pk=request.user.id), listing=Listing.objects.get(pk=listing_id))
         watching.save()
         response['success'] = True
+        response['type'] = 'ADD'
         response['message'] = 'Listing added to watchlist'
 
     return JsonResponse(response)
