@@ -19,4 +19,11 @@
       </li>
     {% endfor %}
   </ul>
+  {% if user.is_authenticated %}
+    <form action="{% url 'auctions:listing' listing_id=listing.id %}" method="post">
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" value="Submit comment">
+    </form>
+  {% endif %}
 </section>
