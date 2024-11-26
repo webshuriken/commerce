@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from .forms import NewListingForm, NewCommentForm
-from .models import User, Listing, Category, Watchlist
+from .models import User, Listing, Category, Watchlist, Comment
 
 
 def index(request, category_id=None):
@@ -44,15 +44,38 @@ def listing(request, listing_id):
     # check if user is watching the listing
     watching = Watchlist.objects.filter(user=request.user.id, listing=listing_id)
 
-    # create new comment form
-    form = NewCommentForm()
+    # POST request
+    if request.method == "POST":
+        form = NewCommentForm(request.POST)
+        if form.is_valid():
+            comment = form.cleaned_data["comment"]
+            # create new comment
+            new_comment = Comment(comment=comment, user=request.user, listing=listing)
 
-    return render(request, "auctions/listing.html", {
-        "listing": listing,
-        "comments": comments,
-        "watching": True if watching.exists() else False,
-        "form": form
-    })
+            try:
+                # apply model validation
+                new_comment.full_clean()
+                new_comment.save()
+                return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
+            except ValidationError as e:
+                # return form to user with errors
+                form.add_error("comment", e.message_dict["comment"])
+                return render(request, "auctions/listing.html", {
+                    "listing": listing,
+                    "comments": comments,
+                    "watching": True if watching.exists() else False,
+                    "form": form
+                })
+    else:
+        # create new comment form
+        form = NewCommentForm()
+
+        return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "comments": comments,
+            "watching": True if watching.exists() else False,
+            "form": form
+        })
 
 
 @login_required(login_url='/login')
