@@ -41,9 +41,12 @@ def listing(request, listing_id):
     # load listing by id and all comments
     listing = Listing.objects.get(pk=listing_id)
     comments = listing.listing_comments.all()
+    # check if user is watching the listing
+    watching = Watchlist.objects.filter(user=request.user.id, listing=listing_id)
     return render(request, "auctions/listing.html", {
         "listing": listing,
-        "comments": comments
+        "comments": comments,
+        "watching": True if watching.exists() else False
     })
 
 
