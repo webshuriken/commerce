@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.exceptions import ValidationError
-from .forms import NewListingForm
+from .forms import NewListingForm, NewCommentForm
 from .models import User, Listing, Category, Watchlist
 
 
@@ -43,10 +43,15 @@ def listing(request, listing_id):
     comments = listing.listing_comments.all()
     # check if user is watching the listing
     watching = Watchlist.objects.filter(user=request.user.id, listing=listing_id)
+
+    # create new comment form
+    form = NewCommentForm()
+
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "comments": comments,
-        "watching": True if watching.exists() else False
+        "watching": True if watching.exists() else False,
+        "form": form
     })
 
 
