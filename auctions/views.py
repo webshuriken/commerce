@@ -1,12 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from .forms import NewListingForm
-from .models import User, Listing, Category
+from .models import User, Listing, Category, Watchlist
 
 
 def index(request, category_id=None):
@@ -40,9 +41,12 @@ def listing(request, listing_id):
     # load listing by id and all comments
     listing = Listing.objects.get(pk=listing_id)
     comments = listing.listing_comments.all()
+    # check if user is watching the listing
+    watching = Watchlist.objects.filter(user=request.user.id, listing=listing_id)
     return render(request, "auctions/listing.html", {
         "listing": listing,
-        "comments": comments
+        "comments": comments,
+        "watching": True if watching.exists() else False
     })
 
 
@@ -92,6 +96,26 @@ def add_listing(request):
         return render(request, "auctions/add_listing.html", {
             "form": form
         })
+
+
+# post required to aceess this view
+@require_POST
+def watch_listing(request, listing_id):
+    user_watching = Watchlist.objects.filter(user=request.user.id, listing=listing_id)
+    response = { 'success': False, 'message': 'The Database could not be updated' }
+    if user_watching:
+        user_watching.delete()
+        response['success'] = True
+        response['type'] = 'REMOVE'
+        response['message'] = 'Listing removed from watchlist'
+    else:
+        watching = Watchlist(user=User.objects.get(pk=request.user.id), listing=Listing.objects.get(pk=listing_id))
+        watching.save()
+        response['success'] = True
+        response['type'] = 'ADD'
+        response['message'] = 'Listing added to watchlist'
+
+    return JsonResponse(response)
 
 
 def login_view(request):
