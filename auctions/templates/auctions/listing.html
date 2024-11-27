@@ -19,7 +19,7 @@
           <form action="{% url 'auctions:listing' listing_id=listing.id %}" method="POST">
             {% csrf_token %}
             {{ bidForm }}
-            <button type="submit">Place bid</button>
+            <input type="submit" value="Submit Bid" name="submit_bid">
           </form>
         </div>
         <div>
