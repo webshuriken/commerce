@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from .forms import NewListingForm, NewCommentForm, NewBidForm
-from .models import User, Listing, Category, Watchlist, Comment
+from .models import User, Listing, Category, Watchlist, Comment, Bid
 
 
 def index(request, category_id=None):
@@ -48,8 +48,9 @@ def listing(request, listing_id):
     if request.method == "POST":
         # check if comment form was submitted
         if 'submit_comment' in request.POST:
-            # populate comment form with posted data
+            # populate comment form with posted data and create fresh bid form
             commentForm = NewCommentForm(request.POST)
+            bidForm = NewBidForm()
             if commentForm.is_valid():
                 comment = commentForm.cleaned_data["comment"]
                 # create new comment
@@ -64,6 +65,23 @@ def listing(request, listing_id):
                     # return commentForm to user with errors
                     commentForm.add_error("comment", e.message_dict["comment"])
 
+        elif 'submit_bid' in request.POST:
+            # populate bid form with posted data and create fresh comment form
+            bidForm = NewBidForm(request.POST)
+            commentForm = NewCommentForm()
+            if bidForm.is_valid():
+                bid = bidForm.cleaned_data["bid"]
+                newBid = Bid(value=bid, user=request.user, listing=listing)
+                # TODO: implemente bid requirements
+
+                try:
+                    # apply model validation
+                    newBid.full_clean()
+                    newBid.save()
+                    return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
+                except ValidationError as e:
+                    # return bidForm to user with error
+                    bidForm.add_error("bid", "Bid must be the same or higher than current value")
     else:
         # create new comment and bid form
         commentForm = NewCommentForm()
