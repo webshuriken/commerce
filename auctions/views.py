@@ -46,38 +46,36 @@ def listing(request, listing_id):
 
     # POST request
     if request.method == "POST":
-        commentForm = NewCommentForm(request.POST)
-        if commentForm.is_valid():
-            comment = commentForm.cleaned_data["comment"]
-            # create new comment
-            new_comment = Comment(comment=comment, user=request.user, listing=listing)
+        # check if comment form was submitted
+        if 'submit_comment' in request.POST:
+            # populate comment form with posted data
+            commentForm = NewCommentForm(request.POST)
+            if commentForm.is_valid():
+                comment = commentForm.cleaned_data["comment"]
+                # create new comment
+                new_comment = Comment(comment=comment, user=request.user, listing=listing)
 
-            try:
-                # apply model validation
-                new_comment.full_clean()
-                new_comment.save()
-                return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
-            except ValidationError as e:
-                # return commentForm to user with errors
-                commentForm.add_error("comment", e.message_dict["comment"])
-                return render(request, "auctions/listing.html", {
-                    "listing": listing,
-                    "comments": comments,
-                    "watching": True if watching.exists() else False,
-                    "commentForm": commentForm
-                })
+                try:
+                    # apply model validation
+                    new_comment.full_clean()
+                    new_comment.save()
+                    return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
+                except ValidationError as e:
+                    # return commentForm to user with errors
+                    commentForm.add_error("comment", e.message_dict["comment"])
+
     else:
         # create new comment and bid form
         commentForm = NewCommentForm()
         bidForm = NewBidForm()
 
-        return render(request, "auctions/listing.html", {
-            "listing": listing,
-            "comments": comments,
-            "watching": True if watching.exists() else False,
-            "commentForm": commentForm,
-            "bidForm": bidForm
-        })
+    return render(request, "auctions/listing.html", {
+        "listing": listing,
+        "comments": comments,
+        "watching": True if watching.exists() else False,
+        "commentForm": commentForm,
+        "bidForm": bidForm
+    })
 
 
 @login_required(login_url='/login')
