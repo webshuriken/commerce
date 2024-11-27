@@ -23,7 +23,7 @@
     <form action="{% url 'auctions:listing' listing_id=listing.id %}" method="post">
       {% csrf_token %}
       {{ commentForm }}
-      <input type="submit" value="Submit comment">
+      <input type="submit" value="Submit comment" name="submit_comment">
     </form>
   {% endif %}
 </section>
