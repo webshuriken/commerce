@@ -14,3 +14,7 @@ class NewListingForm(forms.Form):
 # this form is used to create a new comment
 class NewCommentForm(forms.Form):
     comment = forms.CharField(label="Comment", max_length=512, widget=forms.Textarea(attrs={'placeholder': 'Enter your comment here'}))
+
+# this form is used to create a new bid
+class NewBidForm(forms.Form):
+    bid = forms.DecimalField(label="Bid", max_digits=12, decimal_places=2, widget=forms.NumberInput(attrs={'placeholder': 'Enter your bid'}))
