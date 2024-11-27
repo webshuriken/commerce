@@ -70,7 +70,11 @@ def listing(request, listing_id):
             bidForm = NewBidForm(request.POST)
             commentForm = NewCommentForm()
             if bidForm.is_valid():
+                # get all bids for this listing
+                bids = listing.listing_bids.all()
+                # get bid value from form
                 bid = bidForm.cleaned_data["bid"]
+                # create new bid
                 newBid = Bid(value=bid, user=request.user, listing=listing)
 
                 try:
@@ -82,6 +86,13 @@ def listing(request, listing_id):
                     # 1. bid must be the same or higher than listing value
                     if bid < listing.value:
                         raise Exception("Bid can not be lower than item value")
+                    
+                    # 2. bid must be higher than current highest bid
+                    if bids.exists():
+                        # uses a generator expression to get the highest bid value
+                        highest_bid = max(b.value for b in bids)
+                        if bid <= highest_bid:
+                            raise Exception("Bid must be higher than current highest bid")
                 
                 except ValidationError as e:
                     # return bidForm to user with error
