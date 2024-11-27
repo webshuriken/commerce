@@ -80,13 +80,15 @@ def listing(request, listing_id):
                     ## BID REQUIREMENTS:
 
                     # 1. bid must be the same or higher than listing value
-                    if bid >= listing.value:
-                        # update listing value
-                        newBid = Bid(value=bid, user=request.user, listing=listing)
+                    if bid < listing.value:
+                        raise Exception("Bid can not be lower than item value")
                 
                 except ValidationError as e:
                     # return bidForm to user with error
                     bidForm.add_error("bid", "Bid must be the same or higher than current value")
+                except Exception as e:
+                    # return bidForm to user with error
+                    bidForm.add_error("bid", e)
                 else:
                     # all in order so lets save the bid
                     newBid.save()
