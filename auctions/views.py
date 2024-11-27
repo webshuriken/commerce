@@ -46,9 +46,9 @@ def listing(request, listing_id):
 
     # POST request
     if request.method == "POST":
-        form = NewCommentForm(request.POST)
-        if form.is_valid():
-            comment = form.cleaned_data["comment"]
+        commentForm = NewCommentForm(request.POST)
+        if commentForm.is_valid():
+            comment = commentForm.cleaned_data["comment"]
             # create new comment
             new_comment = Comment(comment=comment, user=request.user, listing=listing)
 
@@ -58,23 +58,23 @@ def listing(request, listing_id):
                 new_comment.save()
                 return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
             except ValidationError as e:
-                # return form to user with errors
-                form.add_error("comment", e.message_dict["comment"])
+                # return commentForm to user with errors
+                commentForm.add_error("comment", e.message_dict["comment"])
                 return render(request, "auctions/listing.html", {
                     "listing": listing,
                     "comments": comments,
                     "watching": True if watching.exists() else False,
-                    "form": form
+                    "commentForm": commentForm
                 })
     else:
         # create new comment form
-        form = NewCommentForm()
+        commentForm = NewCommentForm()
 
         return render(request, "auctions/listing.html", {
             "listing": listing,
             "comments": comments,
             "watching": True if watching.exists() else False,
-            "form": form
+            "commentForm": commentForm
         })
 
 
