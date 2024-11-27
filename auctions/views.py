@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.exceptions import ValidationError
-from .forms import NewListingForm, NewCommentForm
+from .forms import NewListingForm, NewCommentForm, NewBidForm
 from .models import User, Listing, Category, Watchlist, Comment
 
 
@@ -67,14 +67,16 @@ def listing(request, listing_id):
                     "commentForm": commentForm
                 })
     else:
-        # create new comment form
+        # create new comment and bid form
         commentForm = NewCommentForm()
+        bidForm = NewBidForm()
 
         return render(request, "auctions/listing.html", {
             "listing": listing,
             "comments": comments,
             "watching": True if watching.exists() else False,
-            "commentForm": commentForm
+            "commentForm": commentForm,
+            "bidForm": bidForm
         })
 
 
