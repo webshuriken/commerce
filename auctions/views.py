@@ -72,16 +72,25 @@ def listing(request, listing_id):
             if bidForm.is_valid():
                 bid = bidForm.cleaned_data["bid"]
                 newBid = Bid(value=bid, user=request.user, listing=listing)
-                # TODO: implemente bid requirements
 
                 try:
                     # apply model validation
                     newBid.full_clean()
-                    newBid.save()
-                    return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
+
+                    ## BID REQUIREMENTS:
+
+                    # 1. bid must be the same or higher than listing value
+                    if bid >= listing.value:
+                        # update listing value
+                        newBid = Bid(value=bid, user=request.user, listing=listing)
+                
                 except ValidationError as e:
                     # return bidForm to user with error
                     bidForm.add_error("bid", "Bid must be the same or higher than current value")
+                else:
+                    # all in order so lets save the bid
+                    newBid.save()
+                    return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
     else:
         # create new comment and bid form
         commentForm = NewCommentForm()
