@@ -1,0 +1,58 @@
+{% if user.is_authenticated %}
+  <section>
+    {% if user == listing.user %}
+      <a href="{% url 'auctions:close_listing' listing_id=listing.id %}">Close Listing</a>
+    {% else %}
+      <div>
+        <form action="{% url 'auctions:listing' listing_id=listing.id %}" method="POST">
+          {% csrf_token %}
+          {{ bidForm }}
+          <input type="submit" value="Submit Bid" name="submit_bid">
+        </form>
+      </div>
+      <div>
+        <button class="add-to-watchlist" data-listing-id="{{ listing.id }}">
+          {% if watching %}
+            Remove from watch list
+          {% else %}
+            Add to watch list
+          {% endif %}
+        </button>
+        <span class="add-to-watchlist-error"></span>
+      </div>
+    {% endif %}
+  </section>
+{% endif %}
+<div>
+  <h3>Description:</h3>
+  <p>{{ listing.description }}</p>
+</div>
+{% include 'auctions/comments.html' %}
+
+{% if user.is_authenticated %}
+  <script>
+    const button = document.querySelector('.add-to-watchlist');
+    button.addEventListener('click', async function() {
+      const listingId = this.dataset.listingId;
+      fetch(`/watchlist/${listingId}`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          if (data.type === 'ADD') {
+            this.textContent = 'Remove from watch list';
+          } else {
+            this.textContent = 'Add to watch list';
+          }
+        }else{
+          const errorSpan = document.querySelector('.add-to-watchlist-error');
+          errorSpan.textContent = data.error;
+        }
+      })
+    });
+  </script>
+{% endif %}
