@@ -1,7 +1,11 @@
 {% if user.is_authenticated %}
   <section>
     {% if user == listing.user %}
-      <a href="{% url 'auctions:close_listing' listing_id=listing.id %}">Close Listing</a>
+      <form action="{% url 'auctions:close_listing' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="listing_to_close" value="{{ listing.id }}">
+        <input type="submit" value="Close Listing" name="close_listing">
+      </form>
     {% else %}
       <div>
         <form action="{% url 'auctions:listing' listing_id=listing.id %}" method="POST">
@@ -29,7 +33,7 @@
 </div>
 {% include 'auctions/comments.html' %}
 
-{% if user.is_authenticated %}
+{% if user.is_authenticated and user != listing.user %}
   <script>
     const button = document.querySelector('.add-to-watchlist');
     button.addEventListener('click', async function() {
