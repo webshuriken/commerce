@@ -43,6 +43,11 @@ def listing(request, listing_id):
     comments = listing.listing_comments.all()
     # check if user is watching the listing
     watching = Watchlist.objects.filter(user=request.user.id, listing=listing_id)
+    # we get the highest bid for this listing
+    bids = listing.listing_bids.all()
+    highest_bid = None
+    if bids.exists():
+        highest_bid = max(b.value for b in bids)
 
     # POST request
     if request.method == "POST":
@@ -114,7 +119,8 @@ def listing(request, listing_id):
         "comments": comments,
         "watching": True if watching.exists() else False,
         "commentForm": commentForm,
-        "bidForm": bidForm
+        "bidForm": bidForm,
+        "highest_bid": highest_bid
     })
 
 
