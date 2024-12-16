@@ -33,6 +33,7 @@ class Listing(models.Model):
     image = models.URLField(blank=True, null=True)
     user = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name="creator")
     category = models.ForeignKey(Category, default=None, on_delete=models.CASCADE, related_name="category")
+    winner = models.ForeignKey(User, default=None, on_delete=models.PROTECT, related_name="winner", blank=True, null=True)
 
     # custom string representation
     def __str__(self):
