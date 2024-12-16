@@ -185,6 +185,8 @@ def watch_listing(request, listing_id):
 
     return JsonResponse(response)
 
+# post required to aceess this view
+@require_POST
 def close_listing(request):
     pass
 
