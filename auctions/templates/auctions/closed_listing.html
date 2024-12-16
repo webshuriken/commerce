@@ -1,1 +1,13 @@
-<h3>Listing Closed</h3>
+{% if user.is_authenticated %}
+  {% user == listing.winner %}
+    <p>Congratulations, you WON!</p>
+  {% endif %}
+  {% if user == listing.user %}
+    <p>Listing Closed</p>
+    <p>It was won by {{ listing.winner }}</p>
+  {% endif %}
+{% else %}
+<div>
+  <p>Listing Closed</p>
+</div>
+{% endif %}
