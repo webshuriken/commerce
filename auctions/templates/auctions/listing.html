@@ -5,71 +5,25 @@
 {% endblock %}
 
 {% block body %}
-    <section>
-      <header>
-        <h2>{{ listing.title }}</h2>
-        <img src="{{ listing.image }}" alt="Image of {{ listing.title }}">
-      </header>
-      <div>
-        <p>${{ listing.value }}</p>
-      </div>
-      {% if user.is_authenticated %}
-      <section>
-        <div>
-          <form action="{% url 'auctions:listing' listing_id=listing.id %}" method="POST">
-            {% csrf_token %}
-            {{ bidForm }}
-            <input type="submit" value="Submit Bid" name="submit_bid">
-          </form>
-        </div>
-        <div>
-          <button class="add-to-watchlist" data-listing-id="{{ listing.id }}">
-            {% if watching %}
-              Remove from watch list
-            {% else %}
-              Add to watch list
-            {% endif %}
-          </button>
-          <span class="add-to-watchlist-error"></span>
-        </div>
-      </section>
-      {% endif %}
-      <div>
-        <h3>Details:</h3>
-        <ul>
-          <li>Listed by: {{ listing.user }}</li>
-          <li>Category: {{ listing.category }}</li>
-        </ul>
-      </div>
-      <div>
-        <h3>Description:</h3>
-        <p>{{ listing.description }}</p>
-      </div>
-      {% include 'auctions/comments.html' %}
-    </section>
-    <script>
-      const button = document.querySelector('.add-to-watchlist');
-      button.addEventListener('click', async function() {
-        const listingId = this.dataset.listingId;
-        fetch(`/watchlist/${listingId}`, {
-          method: 'POST',
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-          }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            if (data.type === 'ADD') {
-              this.textContent = 'Remove from watch list';
-            } else {
-              this.textContent = 'Add to watch list';
-            }
-          }else{
-            const errorSpan = document.querySelector('.add-to-watchlist-error');
-            errorSpan.textContent = data.error;
-          }
-        })
-      });
-    </script>
+  <section>
+    <header>
+      <h2>{{ listing.title }}</h2>
+      <img src="{{ listing.image }}" alt="Image of {{ listing.title }}">
+    </header>
+    <div>
+      <h3>Details:</h3>
+      <ul>
+        <li>Listed by: {{ listing.user }}</li>
+        <li>Category: {{ listing.category }}</li>
+      </ul>
+    </div>
+    <div>
+      <p>${{ listing.value }}</p>
+    </div>
+    {% if listing.active %}
+      {% include 'auctions/active_listing.html' %}
+    {% else %}
+      {% include 'auctions/closed_listing.html' %}
+    {% endif %}
+  </section>
 {% endblock %}

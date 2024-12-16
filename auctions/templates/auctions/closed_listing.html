@@ -1,0 +1,14 @@
+{% if user.is_authenticated %}
+  {% if user == listing.winner %}
+    <p>Congratulations, you WON!</p>
+  {% endif %}
+  {% if user == listing.user %}
+    <p>Listing Closed</p>
+    <p>It was won by {{ listing.winner }}</p>
+    <p>Winning bid: {{ highest_bid }}</p>
+  {% endif %}
+{% else %}
+<div>
+  <p>Listing Closed</p>
+</div>
+{% endif %}

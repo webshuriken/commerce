@@ -17,4 +17,6 @@ urlpatterns = [
     path("add_listing", views.add_listing, name="add_listing"),
     # the path is only to be used to update the watchlist listing
     path("watchlist/<int:listing_id>", views.watch_listing, name="watchlist_listing"),
+    # path only to be used to cloes a listing
+    path("close_listing", views.close_listing, name="close_listing"),
 ]

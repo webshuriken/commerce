@@ -43,6 +43,11 @@ def listing(request, listing_id):
     comments = listing.listing_comments.all()
     # check if user is watching the listing
     watching = Watchlist.objects.filter(user=request.user.id, listing=listing_id)
+    # we get the highest bid for this listing
+    bids = listing.listing_bids.all()
+    highest_bid = None
+    if bids.exists():
+        highest_bid = max(b.value for b in bids)
 
     # POST request
     if request.method == "POST":
@@ -114,7 +119,8 @@ def listing(request, listing_id):
         "comments": comments,
         "watching": True if watching.exists() else False,
         "commentForm": commentForm,
-        "bidForm": bidForm
+        "bidForm": bidForm,
+        "highest_bid": highest_bid
     })
 
 
@@ -185,6 +191,33 @@ def watch_listing(request, listing_id):
 
     return JsonResponse(response)
 
+# post required to aceess this view
+@require_POST
+def close_listing(request):
+    if request.method == "POST":
+        # grab the listing id from the request
+        listing_id = request.POST["listing_to_close"]
+        # get the listing object using the id
+        listing = Listing.objects.get(pk=listing_id)
+        # get the highest bid for this listing
+        bids = listing.listing_bids.all()
+        # check if there are any bids
+        if bids.exists():
+            # get the highest bid value
+            highest_bid = max(b.value for b in bids)
+            # get the highest bid object
+            highest_bid_obj = bids.get(value=highest_bid)
+            # set the listing winner to the highest bid user
+            listing.winner = highest_bid_obj.user
+            # close the listing
+            listing.active = False
+            listing.save()
+        else:
+            # no bids so just close the listing
+            listing.active = False
+            listing.save()
+
+        return HttpResponseRedirect(reverse("auctions:listing", args=(listing.id,)))
 
 def login_view(request):
     if request.method == "POST":
