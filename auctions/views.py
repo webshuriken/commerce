@@ -185,6 +185,8 @@ def watch_listing(request, listing_id):
 
     return JsonResponse(response)
 
+def close_listing(request):
+    pass
 
 def login_view(request):
     if request.method == "POST":
