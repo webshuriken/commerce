@@ -5,6 +5,7 @@
   {% if user == listing.user %}
     <p>Listing Closed</p>
     <p>It was won by {{ listing.winner }}</p>
+    <p>Winning bid: {{ highest_bid }}</p>
   {% endif %}
 {% else %}
 <div>
