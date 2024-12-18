@@ -1,11 +1,11 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from .models import Listing, User, Comment, Bid, Category
+from .models import Listing, User, Comment, Bid, Category, Watchlist
 # Decimal is used to represent the value of a bid
 from decimal import Decimal
 
 
-# MODELS TESTS
+# LISTING TESTS
 class ListingModelTest(TestCase):
 
     def setUp(self):
@@ -78,6 +78,7 @@ class ListingModelTest(TestCase):
         expected_str = f"ID: {listing.id}: {listing.title}\nDescription: {listing.description}\nValue: {listing.value}\nCreated by: {listing.user}\n"
         self.assertEqual(str(listing), expected_str)
 
+# COMMENT TESTS
 class CommentModelTest(TestCase):
 
     def setUp(self):
@@ -127,6 +128,7 @@ class CommentModelTest(TestCase):
         expected_str = f"ID: {comment.id}: {comment.comment} by user {comment.user}\nFor listing: {comment.listing}\n"
         self.assertEqual(str(comment), expected_str)
 
+# BID TESTS
 class BidModelTest(TestCase):
 
     def setUp(self):
@@ -170,6 +172,7 @@ class BidModelTest(TestCase):
         )
         self.assertEqual(max_value_bid.value, Decimal('99999.99'))
 
+# CATEGORY TESTS
 class CategoryModelTest(TestCase):
 
     def setUp(self):
@@ -206,3 +209,23 @@ class CategoryModelTest(TestCase):
         self.assertEqual(listing.title, "Garden Tools")
         self.assertEqual(listing.category, self.garden_category)
         self.assertEqual(str(listing.category), f"ID: {self.garden_category.id}: Garden\n")
+
+# WATCHLIST TESTS
+class WatchlistModelTest(TestCase):
+
+    def setUp(self):
+        # create a user and a listing
+        self.user = User.objects.create_user(username='testuser', password='12345')
+        self.category = Category.objects.create(name="Test Category")
+        self.listing = Listing.objects.create(
+            title='Test Listing',
+            description='Test Description',
+            value=100.00,
+            user=self.user,
+            category=self.category
+        )
+        # Create the user's watchlist
+        self.watchlist = Watchlist.objects.create(user=self.user)
+
+    def test_watchlist_empty(self):
+        self.assertEqual(self.watchlist.listings.count(), 0)
