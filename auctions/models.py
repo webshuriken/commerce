@@ -60,5 +60,5 @@ class Watchlist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="watchlist")
     listing = models.ForeignKey(Listing, default=None, on_delete=models.CASCADE, related_name="watchlist_listings")
 
-    def __inint__(self):
+    def __str__(self):
         return f"User: {self.user} is Watching : {self.listing}\n"
