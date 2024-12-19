@@ -58,7 +58,7 @@ class Bid(models.Model):
 # Watchlist is a many-to-many relationship between User and Listing
 class Watchlist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="watchlist")
-    listing = models.ForeignKey(Listing, default=None, on_delete=models.CASCADE, related_name="watchlist_listings")
+    listing = models.ManyToManyField(Listing, related_name="watchlist_listings")
 
     def __str__(self):
         return f"User: {self.user} is Watching : {self.listing}\n"
