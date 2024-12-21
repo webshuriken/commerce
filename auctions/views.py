@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from .forms import NewListingForm, NewCommentForm, NewBidForm
@@ -188,15 +188,23 @@ def add_to_watchlist(request, listing_id):
         response['type'] = 'BACKROOMS'
         response['message'] = 'This area is for authenticated users only'
     else:
-        user_watching = Watchlist.objects.filter(user=request.user.id, listing=listing_id)
-        if user_watching:
-            user_watching.delete()
+        # get current user
+        user = request.user
+        
+        # get listing object
+        listing = get_object_or_404(Listing, pk=listing_id)
+
+        # get or create a watchlist for use
+        watchlist, created = Watchlist.objects.get_or_create(user=user)
+
+        # check if the listing is already in the watchlist
+        if watchlist.listing.filter(pk=listing_id).exists():
+            watchlist.listing.remove(listing)
             response['success'] = True
             response['type'] = 'REMOVE'
             response['message'] = 'Listing removed from watchlist'
         else:
-            watching = Watchlist(user=User.objects.get(pk=request.user.id), listing=Listing.objects.get(pk=listing_id))
-            watching.save()
+            watchlist.listing.add(listing)
             response['success'] = True
             response['type'] = 'ADD'
             response['message'] = 'Listing added to watchlist'
