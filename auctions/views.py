@@ -179,20 +179,27 @@ def add_listing(request):
 
 # post required to aceess this view
 @require_POST
-def watch_listing(request, listing_id):
-    user_watching = Watchlist.objects.filter(user=request.user.id, listing=listing_id)
+def add_to_watchlist(request, listing_id):
     response = { 'success': False, 'message': 'The Database could not be updated' }
-    if user_watching:
-        user_watching.delete()
-        response['success'] = True
-        response['type'] = 'REMOVE'
-        response['message'] = 'Listing removed from watchlist'
+    
+    # check if user is authenticated
+    if not request.user.is_authenticated:
+        response['success'] = False
+        response['type'] = 'BACKROOMS'
+        response['message'] = 'This area is for authenticated users only'
     else:
-        watching = Watchlist(user=User.objects.get(pk=request.user.id), listing=Listing.objects.get(pk=listing_id))
-        watching.save()
-        response['success'] = True
-        response['type'] = 'ADD'
-        response['message'] = 'Listing added to watchlist'
+        user_watching = Watchlist.objects.filter(user=request.user.id, listing=listing_id)
+        if user_watching:
+            user_watching.delete()
+            response['success'] = True
+            response['type'] = 'REMOVE'
+            response['message'] = 'Listing removed from watchlist'
+        else:
+            watching = Watchlist(user=User.objects.get(pk=request.user.id), listing=Listing.objects.get(pk=listing_id))
+            watching.save()
+            response['success'] = True
+            response['type'] = 'ADD'
+            response['message'] = 'Listing added to watchlist'
 
     return JsonResponse(response)
 
