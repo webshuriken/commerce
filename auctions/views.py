@@ -126,9 +126,14 @@ def listing(request, listing_id):
 
 @login_required(login_url='/login')
 def watchlist(request):
-    # load watchlist items by user id
-    user_watchlist = request.user.watchlist
-    watchlist = user_watchlist.listing.all()
+    # Hanldes the case where the user does not have a watchlist
+    try:
+        # load watchlist items by user id
+        user_watchlist = request.user.watchlist
+        watchlist = user_watchlist.listing.all()
+    except Watchlist.DoesNotExist:
+        watchlist = []
+
     return render(request, "auctions/watchlist.html", {
         "watchlist": watchlist
     })
